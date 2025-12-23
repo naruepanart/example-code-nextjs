@@ -1,28 +1,16 @@
 import PageComponent from "@/components/PageComponent";
+import { fetchPosts } from "@/lib/posts";
 import React from "react";
 
 export const metadata = {
   title: "Static",
 };
 
-const fetchPostData = async () => {
-  try {
-    const postUrl = `https://jsonplaceholder.typicode.com/posts`;
-    const postResponse = await fetch(postUrl);
-
-    if (!postResponse.ok) {
-      throw new Error(`HTTP error! status: ${postResponse.status}`);
-    }
-
-    return await postResponse.json();
-  } catch (error) {
-    console.error("Failed to fetch static posts:", error);
-    return [];
-  }
-};
+export const dynamic = "force-static";
 
 const page = async () => {
-  const data = await fetchPostData();
+  const data = await fetchPosts({ cache: "force-cache" });
+
   return (
     <>
       <h1>Static</h1>

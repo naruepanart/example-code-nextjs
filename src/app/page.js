@@ -9,8 +9,8 @@ const links = [
 		href: "/csr",
 	},
 	{
-		label: "ISG",
-		href: "/dynamics/isg/1",
+		label: "SSG",
+		href: "/dynamics/ssg/1",
 	},
 	{
 		label: "ISR",

@@ -7,10 +7,16 @@ const CsrPageComponent = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [ref, inView] = useInView();
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchPosts = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     try {
-      const apiUrl = `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}`;
+      const nextPage = Math.floor(data.length / 10) + 1;
+      const apiUrl = `https://jsonplaceholder.typicode.com/posts?_page=${nextPage}&_limit=10`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
@@ -18,19 +24,26 @@ const CsrPageComponent = () => {
       }
 
       const newPosts = await response.json();
-      setData((prevPosts) => [...prevPosts, ...newPosts]);
-      setCurrentPage((prevPage) => prevPage + 1);
+
+      if (newPosts.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      setData((prev) => [...prev, ...newPosts]);
+      setCurrentPage((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (inView) {
+    if (inView && hasMore && !isLoading) {
       fetchPosts();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, inView]);
+  }, [inView]);
 
   return (
     <>

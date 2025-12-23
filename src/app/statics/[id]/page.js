@@ -1,39 +1,18 @@
 import PageIDComponent from "@/components/PageIDComponent";
 import React from "react";
+import { fetchPost } from "@/lib/posts";
 
 export async function generateMetadata({ params }) {
-  const postData = await fetchPostData(params.id);
-  if (!postData) {
-    return {
-      title: "Post not found",
-      description: "The requested post could not be found",
-    };
-  }
+  const post = await fetchPost(params.id);
   return {
-    title: `${postData.id} - ${postData.title}`,
-    description: postData.body,
+    title: `${post.id} - ${post.title}`,
+    description: post.body,
   };
 }
 
-const fetchPostData = async (postId) => {
-  try {
-    const postUrl = `https://jsonplaceholder.typicode.com/posts/${postId}`;
-    const response = await fetch(postUrl);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch post ${postId}: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching static post:", error);
-    return null;
-  }
-};
-
 const page = async ({ params }) => {
   const { id } = params;
-  const data = await fetchPostData(id);
+  const data = await fetchPost(id, { cache: "force-cache" });
 
   if (!data) {
     return (
